@@ -50,8 +50,6 @@ export const heroCreated = (hero) => {
     }
 }
 
-/* Здесь мы получаем уникальный индификатор как payload 
-   И вызывается HERO_DELETED */
 export const heroDeleted = (id) => {
     return {
         type: 'HERO_DELETED',

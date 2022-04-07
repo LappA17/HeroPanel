@@ -1,12 +1,6 @@
 {
   "heroes": [
     {
-      "id": "5c62856f-b311-415c-b5d1-f72cf41ef8f3",
-      "name": "Руслан Потоюк",
-      "description": "dasd",
-      "element": "earth"
-    },
-    {
       "id": "27227466-ed2c-4b57-ba96-4e3d61a93c21",
       "name": "ЫФВ",
       "description": "dasd",
@@ -19,16 +13,16 @@
       "element": "wind"
     },
     {
-      "id": "ec965030-aa6e-41c0-8e2f-f3b7d9301367",
-      "name": "asd",
-      "description": "dasd",
-      "element": "earth"
+      "id": "ade0c058-8d1b-42e0-933c-f76e21c2f5b1",
+      "name": "Руслан Постоюк",
+      "description": "sad",
+      "element": "fire"
     },
     {
-      "id": "53503245-c3a1-4421-8cf1-327322c70e9c",
-      "name": "asda",
-      "description": "asda",
-      "element": "fire"
+      "id": "6ae04e79-7672-4fc3-8e2c-563f75a48125",
+      "name": "Руслан Потоюк",
+      "description": "dasd",
+      "element": "wind"
     }
   ],
   "filters": [

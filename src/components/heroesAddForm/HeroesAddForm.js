@@ -1,13 +1,3 @@
-// Задача для этого компонента:
-// Реализовать создание нового героя с введенными данными. Он должен попадать
-// в общее состояние и отображаться в списке + фильтроваться
-// Уникальный идентификатор персонажа можно сгенерировать через uiid
-// Усложненная задача:
-// Персонаж создается и в файле json при помощи метода POST
-// Дополнительно:
-// Элементы <option></option> желательно сформировать на базе
-// данных из фильтров
-
 import {useHttp} from '../../hooks/http.hook';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,41 +5,19 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { heroCreated } from '../../actions';
 
-/* Здесь для того что бы наша форма была контролируемая мы создавали Локальный Стейты, который потом никуда не идут,
-они существуют только внутри этого Компонента
-    И здесь когда Сабмителась наша форма - те отправлялась на сервер, происходит тоже самое. Мы сначала к JSON обращаемся
-и если только наш запрос был успешен .then(res => console.log(res, 'Отправка успешна')), то только в таком случае мы
-будем Диспетчить новое действие в наш Общий Стор(но если будет ошибка то отправки никакой не будет)
-    Но при успешной отправки мы Постим(POST) новые данные в формате ДЖСОН JSON.stringify(newHero) - и это Объект
-который формируется таким образом: уникальный индификатор при помощи библиотеки, имя, дескрпшон и элемент. И эти все
-элементы у нас выбираются внутри нашей формы 
-
-    return <option key={name} value={name}>{label}</option> Здесь была интересная задача с формирование Фильтеров в нашем
-опшене. Что бы ее решить нужно было избавиться от одного Фильтра, который нам бы мешал. Потому что у нас есть 4 элемента
-а фиьтров у нас 5 потому что там еще был фильтер all(а не только огонь вода и тд)
-    Так вот, что бы от него избавиться мы просто использовали условие if (name === 'all')  return то мы не возвращаем
-кусочек option 
-    
-    А дальше все по старинке: у нас на каждом инпуте висит обработчик события, установлен value из нашего локального
-стейта value={heroName}. И когда у нас изменяется какое-то значение внутри из нашего интерактивного элемента
-onChange={(e) => setHeroName(e.target.value)}, то оно попадает в локальный стейт. 
-    И уже этот Локальный Стейт помогает при формирование нового героя  const newHero = { при отправки нашей формы
-*/
 const HeroesAddForm = () => {
-    // Состояния для контроля формы
     const [heroName, setHeroName] = useState('');
     const [heroDescr, setHeroDescr] = useState('');
     const [heroElement, setHeroElement] = useState('');
 
-    const {filters, filtersLoadingStatus} = useSelector(state => state);
+    //const {filters, filtersLoadingStatus} = useSelector(state => state); Так как мы создали два Редюсера
+    const {filters, filtersLoadingStatus} = useSelector(state => state.filters)
     const dispatch = useDispatch();
     const {request} = useHttp();
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
-        // Можно сделать и одинаковые названия состояний,
-        // хотел показать вам чуть нагляднее
-        // Генерация id через библиотеку
+        
         const newHero = {
             id: uuidv4(),
             name: heroName,
@@ -57,14 +25,11 @@ const HeroesAddForm = () => {
             element: heroElement
         }
 
-        // Отправляем данные на сервер в формате JSON
-        // ТОЛЬКО если запрос успешен - отправляем персонажа в store
         request("http://localhost:3001/heroes", "POST", JSON.stringify(newHero))
             .then(res => console.log(res, 'Отправка успешна'))
             .then(dispatch(heroCreated(newHero)))
             .catch(err => console.log(err));
 
-        // Очищаем форму после отправки
         setHeroName('');
         setHeroDescr('');
         setHeroElement('');
@@ -77,10 +42,8 @@ const HeroesAddForm = () => {
             return <option>Ошибка загрузки</option>
         }
         
-        // Если фильтры есть, то рендерим их
         if (filters && filters.length > 0 ) {
             return filters.map(({name, label}) => {
-                // Один из фильтров нам тут не нужен
                 // eslint-disable-next-line
                 if (name === 'all')  return;
 

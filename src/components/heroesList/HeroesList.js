@@ -2,6 +2,7 @@ import {useHttp} from '../../hooks/http.hook';
 import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CSSTransition, TransitionGroup} from 'react-transition-group';
+import { createSelector } from 'reselect';
 
 import { heroesFetching, heroesFetched, heroesFetchingError, heroDeleted } from '../../actions';
 import HeroesListItem from "../heroesListItem/HeroesListItem";
@@ -9,33 +10,86 @@ import Spinner from '../spinner/Spinner';
 
 import './heroesList.scss';
 
-// Задача для этого компонента:
-// При клике на "крестик" идет удаление персонажа из общего состояния
-// Усложненная задача:
-// Удаление идет и с json файла при помощи метода DELETE
-
-/* Мы onDelete оборачиваем в useCallback потому что эта функция передает ниже по иерархии
-   функция onDelete передает как Проперти какого-то дочернего Компонента
-   <HeroesListItem  {...props} onDelete={() => onDelete(id)}/>
-   И что бы не вызывать каждый раз перерендеринг этого дочернего Компонента HeroesListItem мы это всё заключаем
-в useCallback
-
-    К нам в фцию в качестве аргумента приходит id useCallback((id) и мы его подставялем в наш request
-    Так же передаем метод DELETE что бы удалить из JSON
-    request(`http://localhost:3001/heroes/${id}`, "DELETE") - ЭТО КОМАНДА УДАЛЯЕТ НАШИ ДАННЫЕ ИЗ СЕРВЕРА
-    .then(data => console.log(data, 'Deleted')) - здесь мы точно убеждаемся что наш запрос прошел успешно, причем
-как data от сервера мы получаем того персонажа который был удален
-    И только когда у нас успешно прошел запрос только в таком случае будет выполняться второй then(то-есть именно
-тогда когда данные были удалены из сервера)
-    Потому мы Диспетчим действие по удаление персонажа по уникальному индификатору
-    Заходим в акшен и смотрим что там
-    Так же заходим в reducer и смотрим код там
-    Так же в onDelete мы передаем id, а именно onDelete={() => onDelete(id)}, id мы получаем с сервера JSON 
-    И эта id приходит в качестве Пропсов
-
-    */
 const HeroesList = () => {
-    const {filteredHeroes, heroesLoadingStatus} = useSelector(state => state);
+
+    /* Мы получаем этих героев return state.heroes из стейта с героями логично
+   А эти state.activeFilter с фильтрами 
+   Мы из это фции будем возвращать Объект
+   Мы получаем Объект который содержит данные из двух разных Редьюсеров
+   Но при таком способе Компонент будет при каждом изменение перерисовываться, потому что в Хуке идет строгое сравнение
+потому что мы Объект в someState строго сравниваем с Объектом который был до этого
+    Этот вариант очень НЕ ОПТИМИЗИРОВАН И ЕГО ЛУЧШЕ НИКОГДА НЕ ИСПОЛЬЗОВАТЬ*/
+    /* const someState = useSelector(state => ({
+        activeFilter: state.filters.activeFilter,
+        heroes: state.heroes.heroes
+    })) 
+    
+    Решить проблему можно вот так вот state.filters.activeFilter , state.heroes.heroes
+    Но у такого кода могут быть просадки при оптимизации 
+    Впишем console.log('render')
+    И теперь после каждого нажатие на фильтер - идет перерендеринг
+    То-есть при изменение глобального стейта - у нас вызывается useSelector
+    Но у нас как была строка all так и осталась state.filters.activeFilter === 'all' но приложение отслеживает
+что у нас какой-то триггер был и он у нас поменялся, даже не смотря что знаечние внутри точно такое же, именно по этому
+useSelector у нас срабатывает каждый раз и каждый раз он формирует новый список героев 
+
+    ЧТО БЫ РЕШИТЬ ПРОБЛЕМУ у нас есть фция createSelector которая будет мемоизировать значение - запоминать его
+    Прописываем npm i reselect --save
+    Пишем import { createSelector } from 'reselect';
+    
+    Мы будем создавать новый Селектор
+    Наша Первая Фция получает в себя стейт - наше глобально состояние и будет возвращать активный фильтер из фильтров
+    (state) => state.filters.activeFilter
+    То-есть результатом первой фции будет получение из стейта текущий активный фильтр
+    Вторая Функция будет получать Геров
+    Потом берём то что пришло из Первой и Второй фции
+    ТЕПЕРЬ МЕНЯЕМ state.filters.activeFilter НА ПРОСТО filter
+    А state.heroes.heroes НА heroes
+
+    Как итог в filteredHeroesSelector мы получили ФУНКЦИЮ-СЕЛЕКТОР - так называются функции которые получают кусочек
+нашего стейта
+    const filteredHeroes = useSelector(filteredHeroesSelector) формируем список готовый героев
+
+    Теперь при тесте на страничке у нас нет перернедринг при клике на all, это значит что у нас при помощи
+createSelector была мемоизация, теперь фция знает что если у нас одно и тоже значение внутри фильтра то она не будет 
+вызываться просто так
+ */
+    const filteredHeroesSelector = createSelector(
+        (state) => state.filters.activeFilter,
+        (state) => state.heroes.heroes,
+        (filter, heroes) => {
+            if (filter === 'all') {
+                console.log('render');
+                return heroes;
+            } else {
+                return heroes.filter(item => item.element === filter);
+            }
+        }
+    );
+
+    /* Мы можем заниматься фильтрацией на получение файлов с нашего Стора
+    Но мы не как не задействовали фцию Селектор, а именно она отвеат за получение каких-то данных
+    Будем заниматься фильтрацией именно здесь что именно если у нас списко героев стоит как all те все то мы не будем
+их фильтровать
+    Если первое условие выполняется то мы сюда filteredHeroes получаем стейт всех загруженных героев
+    И раз эта переменная у нас использовалась только в одном файлике,то мы можем теперь спокойно почистить reducer
+    */
+    /* const filteredHeroes = useSelector(state => {
+        if (state.filters.activeFilter === 'all') {
+            console.log('render')
+            return state.heroes.heroes
+        } else {
+            return state.heroes.heroes.filter(item => item.element === state.filters.activeFilter) Мы из Стейта 
+            вытягиваем список геров, потом начинаем его фильтровать и если элемент который перебирается(item) его 
+            фильтер совпадает с активным фильтром, то в таком случае он попадает в новый массив
+        }
+    }) */
+
+    const filteredHeroes = useSelector(filteredHeroesSelector)
+
+    const {heroesLoadingStatus} = useSelector(state => state);
+    //const {filteredHeroes ,heroesLoadingStatus} = useSelector(state => state);
+
     const dispatch = useDispatch();
     const {request} = useHttp();
 
@@ -48,9 +102,6 @@ const HeroesList = () => {
         // eslint-disable-next-line
     }, []);
 
-    // Функция берет id и по нему удаляет ненужного персонажа из store
-    // ТОЛЬКО если запрос на удаление прошел успешно
-    // Отслеживайте цепочку действий actions => reducers
     const onDelete = useCallback((id) => {
         // Удаление персонажа по его id
         request(`http://localhost:3001/heroes/${id}`, "DELETE")

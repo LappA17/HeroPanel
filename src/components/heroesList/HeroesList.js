@@ -10,14 +10,6 @@ import Spinner from '../spinner/Spinner';
 
 import './heroesList.scss';
 
-/* Мы знаем что в dispatch мы можем передавать только свойство type и пондобноти дополнтиельные полям типа payload
-   Бывают приччины когда в диспетч отправляется не объект а строка или функция или что-то другое 
-   Допустим вместо dispatch(heroesFetching() будет dispatch("HEROES_FETCHING"), то у нас будет ошибка где говорится
-что Фетчинги должны быть обычнымы Объектами и если мы хотим использовать дополнительную строку то нам нужно использовать
-наш собственный middleware
-
-    Заходим в файлик со стором*/
-
 const HeroesList = () => {
 
     const filteredHeroesSelector = createSelector(

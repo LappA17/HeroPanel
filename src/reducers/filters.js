@@ -4,9 +4,6 @@ const initialState = {
     activeFilter: 'all'
 }
 
-/* Это файлик с герояи по-этому всё что связанно с фильтрами я уберу
-   И удаляем все что свзанно с фильтрами */
-
 const filters = (state = initialState, action) => {
     switch (action.type) {
         case 'FILTERS_FETCHING':
@@ -24,11 +21,11 @@ const filters = (state = initialState, action) => {
             return {
                 ...state,
                 filtersLoadingStatus: 'error'
-            }   
+            }
         case 'ACTIVE_FILTER_CHANGED':
             return {
                 ...state,
-                activeFilter: action.payload, 
+                activeFilter: action.payload
             }
         default: return state
     }

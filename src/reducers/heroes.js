@@ -1,10 +1,7 @@
 const initialState = {
     heroes: [],
-    heroesLoadingStatus: 'idle',
+    heroesLoadingStatus: 'idle'
 }
-
-/* Это файлик с герояи по-этому всё что связанно с фильтрами я уберу
-   И удаляем все что свзанно с фильтрами */
 
 const heroes = (state = initialState, action) => {
     switch (action.type) {
@@ -32,7 +29,7 @@ const heroes = (state = initialState, action) => {
         case 'HERO_DELETED': 
             return {
                 ...state,
-                heroes: state.heroes.filter(item => item.id !== action.payload),
+                heroes: state.heroes.filter(item => item.id !== action.payload)
             }
         default: return state
     }

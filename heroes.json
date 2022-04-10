@@ -1,18 +1,6 @@
 {
   "heroes": [
     {
-      "id": "27227466-ed2c-4b57-ba96-4e3d61a93c21",
-      "name": "ЫФВ",
-      "description": "dasd",
-      "element": "wind"
-    },
-    {
-      "id": "e1cdb829-e365-4b07-ad6a-cef78070e057",
-      "name": "Руслан Потоюк",
-      "description": "asd",
-      "element": "wind"
-    },
-    {
       "id": "ade0c058-8d1b-42e0-933c-f76e21c2f5b1",
       "name": "Руслан Постоюк",
       "description": "sad",
@@ -23,6 +11,12 @@
       "name": "Руслан Потоюк",
       "description": "dasd",
       "element": "wind"
+    },
+    {
+      "id": "3474cabe-2aac-48bb-b7d6-c23fd278677a",
+      "name": "Руслан",
+      "description": "dsD",
+      "element": "water"
     }
   ],
   "filters": [

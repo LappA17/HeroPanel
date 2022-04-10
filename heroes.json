@@ -1,18 +1,6 @@
 {
   "heroes": [
     {
-      "id": "ade0c058-8d1b-42e0-933c-f76e21c2f5b1",
-      "name": "Руслан Постоюк",
-      "description": "sad",
-      "element": "fire"
-    },
-    {
-      "id": "6ae04e79-7672-4fc3-8e2c-563f75a48125",
-      "name": "Руслан Потоюк",
-      "description": "dasd",
-      "element": "wind"
-    },
-    {
       "id": "3474cabe-2aac-48bb-b7d6-c23fd278677a",
       "name": "Руслан",
       "description": "dsD",

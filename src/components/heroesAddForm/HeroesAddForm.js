@@ -3,21 +3,19 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 
-import { heroCreated } from '../../actions';
+import { heroCreated } from '../heroesList/heroesSlice'; //теперь не с actions импортируем
 
 const HeroesAddForm = () => {
     const [heroName, setHeroName] = useState('');
     const [heroDescr, setHeroDescr] = useState('');
     const [heroElement, setHeroElement] = useState('');
 
-    //const {filters, filtersLoadingStatus} = useSelector(state => state); Так как мы создали два Редюсера
-    const {filters, filtersLoadingStatus} = useSelector(state => state.filters)
+    const {filters, filtersLoadingStatus} = useSelector(state => state.filters);
     const dispatch = useDispatch();
     const {request} = useHttp();
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
-        
         const newHero = {
             id: uuidv4(),
             name: heroName,

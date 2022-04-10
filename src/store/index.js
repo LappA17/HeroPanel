@@ -1,7 +1,8 @@
 //import { createStore, combineReducers, compose, applyMiddleware } from 'redux'; 
 import { configureStore } from '@reduxjs/toolkit'
 // import ReduxThunk from 'redux-thunk' 
-import heroes from '../reducers/heroes'
+// import heroes from '../reducers/heroes' Вместо этого пишем так '../components/heroesList/heroesSlice'
+import heroes from '../components/heroesList/heroesSlice'//потому что по дефолту импортируем reducer
 import filters from '../reducers/filters';
 
 

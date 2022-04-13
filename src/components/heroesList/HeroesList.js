@@ -2,14 +2,10 @@ import {useHttp} from '../../hooks/http.hook';
 import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CSSTransition, TransitionGroup} from 'react-transition-group';
-import { createSelector } from 'reselect';
+//import { createSelector } from '@reduxjs/toolkit'; createSelector теперь в слайс
 
-/* Так как мы создали новый Екшен fetchHeroes то три сущности из них уже не используются
-   Они включены в один ЕкшенКрейтор который делает все за нас */
-//import { heroesFetching, heroesFetched, heroesFetchingError, heroDeleted } from '../../actions';
-//import { fetchHeroes, heroDeleted } from '../../actions';
-import { fetchHeroes } from '../../actions'; //мы не можем пока что переписать fetchHeroes по этому импортируем с actions
-import { heroDeleted } from './heroesSlice';
+//import { heroDeleted, fetchHeroes, selectAll } from './heroesSlice'; //импортируем selectAll
+import { heroDeleted, fetchHeroes, filteredHeroesSelector } from './heroesSlice';
 
 import HeroesListItem from "../heroesListItem/HeroesListItem";
 import Spinner from '../spinner/Spinner';
@@ -18,9 +14,23 @@ import './heroesList.scss';
 
 const HeroesList = () => {
 
-    const filteredHeroesSelector = createSelector(
+    /* (state) => state.heroes.entities - здесь мы просто передавали функцию, функция которая просто получает автоматически аргумент Стейта
+и она что-то возвращает. Мы эту функцию создавали вручную. Но так как у нас теперь есть selectAll которая была создана заранее разработчиками
+то мы просто передаем эту функцю
+    selectAll так же получит наш стейт и вернет массив с данными(с героями) который нам нужен
+    Теперь немного вспомним как работает createSelector. selectAll - наша вторая функция, которая возвращает наших героев(именно массив). 
+И так как наша третяя функция у нас заключительная (filter, heroes) => , она берет первый аргумент filter(который мы получаем из state.filters.activeFilter)
+И второй аргумент - heroes который мы получает из функции selectAll 
+    
+    Теперь наши отфильтрованные герои const filteredHeroes = useSelector(filteredHeroesSelector), именна эта переменная filteredHeroes
+спокойно передается вот в эту функцию renderHeroesList(filteredHeroes). Эта функция ожидает что у нас будет массив и он перебирается с 
+помощью map 
+
+    Переносим весь этот Селектор в Слайс*/
+    /* const filteredHeroesSelector = createSelector(
         (state) => state.filters.activeFilter,
-        (state) => state.heroes.heroes,
+        //(state) => state.heroes.entities(было heroes)
+        selectAll,
         (filter, heroes) => {
             if (filter === 'all') {
                 return heroes;
@@ -28,7 +38,7 @@ const HeroesList = () => {
                 return heroes.filter(item => item.element === filter);
             }
         }
-    );
+    ); */
 
     const filteredHeroes = useSelector(filteredHeroesSelector);
     const heroesLoadingStatus = useSelector(state => state.heroes.heroesLoadingStatus);
@@ -36,7 +46,7 @@ const HeroesList = () => {
     const {request} = useHttp();
 
     useEffect(() => {
-        dispatch(fetchHeroes(request));
+        dispatch(fetchHeroes());
         // eslint-disable-next-line
     }, []);
 
